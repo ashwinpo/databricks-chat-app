@@ -1,45 +1,28 @@
-# Plastipak AI Assistant Demo 
+# AI Chat Assistant
 
-A secure, internal chat interface for Plastipak that provides document upload, summarization, and extraction capabilities using Databricks. This application offers a ChatGPT-like experience while maintaining enterprise-grade security and governance.
+A stateless and secure chat interface with LLM capabilities and file upload functionality, deployed as a Databricks App. The model serving endpoint can connect to a variety of LLM providers.
 
 ## 🎯 Overview
 
-This demo showcases an internal chat interface that allows Plastipak employees to:
-- Upload and analyze documents (PDF, DOCX, TXT, MD)
-- Ask questions about uploaded content
-- Get AI-powered responses about packaging solutions
-- Maintain secure, private document handling with Azure Active Directory integration
+This application provides:
+- Document upload and analysis (PDF, DOCX, TXT, MD)
+- AI-powered chat interface for document Q&A
+- Stateless design - no data persistence
+- Secure processing within Databricks environment
 
 ## ✨ Key Features
 
-### AI-Powered Chat Interface
-- **ChatGPT-like Experience**: Modern, intuitive chat interface with real-time responses
-- **Document Analysis**: Upload and extract text from multiple document formats
-- **Context-Aware Responses**: AI assistant provides relevant answers based on uploaded documents
-- **Conversation History**: Maintain chat sessions with document context
-
-### Document Processing
-- **Multi-Format Support**: PDF, DOCX, TXT, and Markdown files
-- **Text Extraction**: Automatic extraction and processing of document content
-- **Context Integration**: Seamless integration of document content into chat conversations
-
-### Security & Governance
-- **Azure AD Integration**: User authentication and access control via Azure Active Directory
-- **Private Document Handling**: All uploaded documents remain within Plastipak's secure environment
-- **User Session Management**: Individual user sessions with proper isolation
-- **Enterprise-Grade Security**: No external API calls to third-party services
+- **Document Upload**: Support for PDF, DOCX, TXT, and Markdown files
+- **Text Extraction**: Automatic processing of document content
+- **AI Chat Interface**: Real-time responses based on uploaded documents
+- **Stateless Design**: No data persistence between sessions
+- **Secure Processing**: All processing within Databricks environment
 
 ## 🏗️ Technical Architecture
 
-### Backend Infrastructure
-- **Databricks Model Serving**: Uses Databricks LLM endpoints (Llama-4-Maverick)
-- **Stateless Design**: Scalable architecture that can be deployed on-premises or in cloud
-
-### Frontend Technology
-- **Streamlit**: Modern web interface with responsive design
-- **Custom Styling**: Plastipak-branded UI with professional appearance
-- **Real-time Updates**: Dynamic chat interface with immediate response display
-
+- **Databricks Model Serving**: Uses Databricks LLM endpoints
+- **Streamlit Frontend**: Modern web interface
+- **Stateless Design**: Scalable architecture
 
 ## 🚀 Deployment Options
 
@@ -71,28 +54,18 @@ python-docx
 
 ## 🚀 Getting Started
 
-### Testing Locally
-1. **Git clone in your IDE or preferred workspace.**
-
-2. **Deploy Application**
-   ```bash
-   # Install dependencies
-   pip install -r requirements.txt
-   
-   # Run the application
-   streamlit run app.py
-   ```
-
 ### Develop and run the Databricks app locally
 
-1. **Clone the app template repository:**
+See documentation [here](https://docs.databricks.com/aws/en/generative-ai/agent-framework/chat-app)
+
+1. **Clone this repository:**
    ```bash
-   git clone https://github.com/databricks/app-templates 
+   git clone https://github.com/ashwinpo/databricks-chat-app
+   cd databricks-chat-app
    ```
 
 2. **Install the required libraries:**
    ```bash
-   cd e2e-chatbot-app
    pip install -r requirements.txt
    ```
 
@@ -110,11 +83,49 @@ python-docx
    streamlit run app.py
    ```
 
-### Deploying in Databricks
+### Deploy the Databricks app programmatically
+
+Deploy the example as a Databricks app to share it with others.
+
+1. **Create the Databricks App:**
+   Run `databricks app create` to create the Databricks App. The following snippet assumes `SERVING_ENDPOINT` is still set - if not, replace it with your serving endpoint name:
+
+   ```bash
+   databricks apps create --json '{
+     "name": "my-agent-chatbot",
+     "resources": [
+       {
+         "name": "serving-endpoint",
+         "serving_endpoint": {
+           "name": "'"$SERVING_ENDPOINT"'",
+           "permission": "CAN_QUERY"
+         }
+       }
+     ]
+   }'
+   ```
+
+2. **Upload source code and deploy:**
+   Upload the source code to Databricks and deploy the app by running the following commands from the `databricks-chat-app` directory:
+
+   ```bash
+   DATABRICKS_USERNAME=$(databricks current-user me | jq -r .userName)
+   databricks sync . "/Users/$DATABRICKS_USERNAME/databricks-chat-app"
+   databricks apps deploy my-agent-chatbot --source-code-path "/Workspace/Users/$DATABRICKS_USERNAME/databricks-chat-app"
+   ```
+
+3. **Get the app URL:**
+   Get the URL of your app and test the app:
+
+   ```bash
+   databricks apps get my-agent-chatbot | jq -r '.url'
+   ```
+
+### Deploying in Databricks via UI
 
 1. **Setup your Databricks Environment**
 - Git clone in Databricks
-   - Workspace > Create > Git folder > copy & paste Git repository URL
+   - Workspace > Create > Git folder > copy & paste Git repository URL: https://github.com/ashwinpo/databricks-chat-app
    - Create Git Folder
 
 - Create the app via Databricks UI
